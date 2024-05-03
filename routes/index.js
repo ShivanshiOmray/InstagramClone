@@ -18,8 +18,9 @@ router.get("/feed", isLoggedIn, function (req, res) {
   res.render("feed", { footer: true });
 });
 
-router.get("/profile", isLoggedIn, function (req, res) {
-  res.render("profile", { footer: true });
+router.get("/profile", isLoggedIn, async function (req, res) {
+  const user = await userModel.findOne({ username: req.session.passport.user });
+  res.render("profile", { footer: true, user });
 });
 
 router.get("/search", isLoggedIn, function (req, res) {

@@ -5,29 +5,42 @@
   >
     <i class="text-white ri-search-line"></i>
     <input
+      id="inputusername"
       class="ml-1 w-full bg-zinc-900 outline-none text-zinc-400"
       type="text"
       placeholder="search username"
     />
   </div>
-  <div class="users">
-    <a href="/profile" class="outline-none">
+  <div class="users"></div>
+</div>
+
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"
+  integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+<script>
+  const inp = document.querySelector("#inputusername");
+  let clutter = "";
+  inp.addEventListener("input", function () {
+    axios.get(`/username/${inp.value}`).then(function (response) {
+      clutter = "";
+      response.data.forEach(function (elem) {
+        clutter += `<a href="/profile" class="outline-none">
       <div class="text-white flex items-center gap-2 mt-5">
-        <div class="image w-[11vw] h-[11vw] rounded-full bg-sky-100"></div>
+        <div class="image w-[11vw] h-[11vw] rounded-full overflow-hidden">
+            <img class="w-full h-full object-cover" src="/images/uploads/${elem.profileImage}" alt="">
+        </div>
         <div class="text">
-          <h3>username</h3>
-          <h4 class="text-xs opacity-30 leading-none">name</h4>
+          <h3>${elem.username}</h3>
+          <h4 class="text-xs opacity-30 leading-none">${elem.name}</h4>
         </div>
       </div>
-    </a>
-
-    <div class="text-white flex items-center gap-2 mt-5">
-      <div class="image w-[11vw] h-[11vw] rounded-full bg-sky-100"></div>
-      <div class="text">
-        <h3>username</h3>
-        <h4 class="text-xs opacity-30 leading-none">name</h4>
-      </div>
-    </div>
-  </div>
-</div>
+    </a>`;
+      });
+      document.querySelector(".users").innerHTML = clutter;
+    });
+  });
+</script>
 <% include ./partials/footer.ejs %>

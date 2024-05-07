@@ -21,6 +21,24 @@ router.get("/feed", isLoggedIn, async function (req, res) {
   const posts = await postModel.find().populate("user");
   res.render("feed", { footer: true, posts, user });
 });
+router.get("/like/:postid", isLoggedIn, async function (req, res) {
+  const user = await userModel.findOne({ username: req.session.passport.user });
+  const post = await postModel.findOne({ _id: req.params.postid });
+  if (post.likes.indexOf(user._id) === -1) {
+    post.likes.push(user._id);
+  } else {
+    post.likes.splice(post.likes.indexOf(user._id), 1);
+  }
+  await post.save();
+  res.json(post);
+});
+
+router.get("/save/:postid", isLoggedIn, async function (req, res) {
+  const user = await userModel.findOne({ username: req.session.passport.user });
+  user.saved.push(req.params.postid);
+  await user.save();
+  res.json(user);
+});
 
 router.get("/profile", isLoggedIn, async function (req, res) {
   const user = await userModel

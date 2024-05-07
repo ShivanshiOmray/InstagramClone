@@ -131,4 +131,108 @@
     <% }) %>
   </div>
 </div>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"
+  integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+  integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+<script>
+  function handleLike() {
+    document.querySelector(".posts").addEventListener("click", function (ev) {
+      var icon = ev.target;
+      if (ev.target.classList.contains("like")) {
+        axios(`/like/${ev.target.dataset.id}`).then(function (res) {
+          if (icon.classList.contains("ri-heart-3-line")) {
+            icon.classList.add("ri-heart-3-fill", "text-red-500");
+            icon.classList.remove("ri-heart-3-line");
+          } else {
+            icon.classList.remove("ri-heart-3-fill", "text-red-500");
+            icon.classList.add("ri-heart-3-line");
+          }
+
+          ev.target.parentNode.parentNode.parentNode.querySelector(
+            ".likes"
+          ).textContent = res.data.likes.length + " Likes";
+        });
+      }
+    });
+  }
+
+  function makeHeartAnimation(ev) {
+    document.querySelector(".posts").addEventListener("click", function (ev) {
+      if (ev.target.classList.contains("posting")) {
+        var icon = document.createElement("i");
+        icon.classList.add(
+          "ri-heart-3-fill",
+          "text-6xl",
+          "text-red-500",
+          "z-[34]",
+          "absolute",
+          "top-1/2",
+          "left-1/2",
+          "-translate-x-1/2",
+          "-translate-y-1/2"
+        );
+        ev.target.parentNode.parentNode.appendChild(icon);
+
+        axios.get(`/like/${ev.target.dataset.id}`).then(function (response) {
+          var icon = ev.target.parentNode.parentNode.querySelector(".like");
+          if (icon.classList.contains("ri-heart-3-line")) {
+            icon.classList.add("ri-heart-3-fill", "text-red-500");
+            icon.classList.remove("ri-heart-3-line");
+          } else {
+            icon.classList.remove("ri-heart-3-fill", "text-red-500");
+            icon.classList.add("ri-heart-3-line");
+          }
+
+          var likes = ev.target.parentNode.parentNode.querySelector(".likes");
+          likes.textContent = response.data.likes.length + " Likes";
+        });
+
+        gsap.from(icon, {
+          y: 20,
+          opacity: 0,
+          ease: "linear",
+          onComplete: function () {
+            gsap.to(icon, {
+              y: -20,
+              opacity: 0,
+              ease: "linear",
+            });
+          },
+        });
+      }
+    });
+  }
+
+  function handleSave() {
+    var save = document.querySelector(".posts");
+    save.addEventListener("click", function (ev) {
+      if (ev.target.classList.contains("save")) {
+        console.log(ev.target.dataset);
+        axios.get(`/save/${ev.target.dataset.id}`).then(function (res) {
+          console.log(res);
+          if (ev.target.classList.contains("ri-bookmark-line")) {
+            ev.target.classList.add("ri-bookmark-fill", "text-white");
+            ev.target.classList.remove("ri-bookmark-line");
+          } else {
+            ev.target.classList.remove("ri-bookmark-fill", "text-white");
+            ev.target.classList.add("ri-bookmark-line");
+          }
+        });
+      }
+    });
+  }
+
+  handleLike();
+  handleSave();
+  makeHeartAnimation();
+</script>
 <% include ./partials/footer.ejs %>

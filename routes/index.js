@@ -3,6 +3,7 @@ var router = express.Router();
 const passport = require("passport");
 var userModel = require("./users");
 var postModel = require("./post");
+var storyModel = require("./story");
 const upload = require("./multer");
 
 const localStrategy = require("passport-local");
@@ -96,12 +97,20 @@ router.post(
       username: req.session.passport.user,
     });
 
-    const post = await postModel.create({
-      picture: req.file.filename,
-      user: user._id,
-      caption: req.body.caption,
-    });
-    user.posts.push(post._id);
+    if (req.body.type === "post") {
+      const post = await postModel.create({
+        picture: req.file.filename,
+        user: user._id,
+        caption: req.body.caption,
+      });
+      user.posts.push(post._id);
+    } else if (req.body.type === "story") {
+      const story = await storyModel.create({
+        image: req.file.filename,
+        user: user._id,
+      });
+      user.stories.push(story._id);
+    }
 
     await user.save();
     res.redirect("/feed");

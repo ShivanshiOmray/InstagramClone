@@ -17,10 +17,30 @@ router.get("/login", function (req, res) {
   res.render("login", { footer: false });
 });
 
+router.get("/story", isLoggedIn, async function (req, res) {
+  const user = await userModel.findOne({ username: req.session.passport.user });
+  res.render("story", { footer: false, user });
+});
+router.get("/story/:id", isLoggedIn, async function (req, res) {
+  const user = await userModel.findOne({ username: req.session.passport.user });
+  const story = await storyModel.findOne({ _id: req.params.id });
+  res.render("story", { footer: false, user, story });
+});
+
 router.get("/feed", isLoggedIn, async function (req, res) {
   const user = await userModel.findOne({ username: req.session.passport.user });
   const posts = await postModel.find().populate("user");
-  res.render("feed", { footer: true, posts, user });
+
+  const stories = await storyModel.find().populate("user");
+  var obj = {};
+  const packs = stories.filter(function (story) {
+    if (!obj[story.user._id]) {
+      obj[story.user._id] = "";
+      return true;
+    }
+  });
+  console.log(packs);
+  res.render("feed", { footer: true, posts, user, stories: packs });
 });
 router.get("/like/:postid", isLoggedIn, async function (req, res) {
   const user = await userModel.findOne({ username: req.session.passport.user });
